@@ -23,14 +23,16 @@ class Users(models.Model):
         default=10000000)  # наличие default значения позволяет вызвать функцию save без конфликтов....
     total = models.IntegerField(default=5000)
 
+    """
+    # overrides method in django.model class, found in stackoverflow
     def save(self, *args, **kwargs):
         time_part = int(datetime.datetime.now().timestamp())
         self.wallet_number = int(time_part)
         super(Users, self).save(*args, **kwargs)
+    """
 
-
-def __str__(self):
-    return "{} [{}] <{}> : {}".format(self.username, self.password, self.wallet_number, self.total)
+    def __str__(self):
+        return "{} [{}] <{}> : {}".format(self.username, self.password, self.wallet_number, self.total)
 
 
 class Transaction(models.Model):

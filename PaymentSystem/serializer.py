@@ -14,6 +14,7 @@ class SystemUsersSerializer(serializers.ModelSerializer):
         # read_only_fields = ('wallet_number',)
 
 
+
 class TransactionSerializer(serializers.ModelSerializer):
     """
     Serializing all the transactions

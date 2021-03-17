@@ -12,5 +12,6 @@ router.register(r'transactionViewSet', TransactionsViewSet)
 
 urlpatterns = router.urls + [
     path('users/', UsersView.as_view()),
-    path('transactions/', TransactionsView.as_view())
+    # path('transactions/', TransactionsView.as_view()),
+    path('transactions/<int:id>', TransactionsView.as_view)
 ]
