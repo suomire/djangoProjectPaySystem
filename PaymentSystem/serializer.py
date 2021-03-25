@@ -10,9 +10,8 @@ class SystemUsersSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Users
-        fields = ('id', 'username', 'password', 'wallet_number', 'total')
-        # read_only_fields = ('wallet_number',)
-
+        fields = ('wallet_number', 'username', 'password', 'total')
+        read_only_fields = ('wallet_number',)
 
 
 class TransactionSerializer(serializers.ModelSerializer):

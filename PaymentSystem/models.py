@@ -1,4 +1,5 @@
 import datetime
+import random
 
 from django.db import models
 
@@ -7,7 +8,7 @@ from django.db import models
 
 def generate_wallet_number():
     time_part = int(datetime.datetime.now().timestamp())
-    return int(time_part)
+    return int(time_part)+random.randint(112, 100000000)
 
 
 class Users(models.Model):
@@ -41,6 +42,7 @@ class Transaction(models.Model):
         transaction_amount          Amount of money to send
 
     """
+
     sender_wallet_number = models.ForeignKey('Users', related_name='senders_wallet', on_delete=models.RESTRICT)
     receiver_wallet_number = models.ForeignKey(to=Users, related_name='receiver_wallet', on_delete=models.RESTRICT)
     transaction_amount = models.IntegerField()
