@@ -3,7 +3,7 @@ from rest_framework import serializers
 from PaymentSystem.models import Transaction, Users
 
 
-class SystemUsersSerializer(serializers.ModelSerializer):
+class UsersSerializer(serializers.ModelSerializer):
     """
     Serializing all the users
     """

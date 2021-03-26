@@ -7,8 +7,8 @@ from django.db import models
 # Create your models here.
 
 def generate_wallet_number():
-    time_part = int(datetime.datetime.now().timestamp())
-    return int(time_part)+random.randint(112, 100000000)
+    number = ''.join([random.choice('1234567890') for _ in range(12)])
+    return int(number)
 
 
 class Users(models.Model):
