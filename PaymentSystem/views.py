@@ -9,12 +9,6 @@ from rest_framework.response import Response
 from .models import Users, Transaction
 from .serializer import UsersSerializer, TransactionSerializer
 
-import logging
-
-logging.basicConfig(
-    # filename='views.log',
-    level=logging.DEBUG)
-
 
 class UsersViewSet(viewsets.ModelViewSet):
     serializer_class = UsersSerializer
@@ -45,6 +39,8 @@ class UsersView(views.APIView):
 
 class TransactionsView(views.APIView):
 
+    # TODO: после добавления авторизации проверять пару токен-кошелек_отправителя на валидность
+
     def get_object(self, wallet_number):
         """
         Get user instance using unique wallet number
@@ -54,7 +50,7 @@ class TransactionsView(views.APIView):
         """
         try:
             return Users.objects.get(wallet_number=wallet_number)
-        except(Users.DoesNotExist, ValidationError):
+        except(Users.DoesNotExist, ValidationError, TypeError):
             raise status.HTTP_400_BAD_REQUEST
 
     def validate_users(self, wallets):
@@ -62,14 +58,15 @@ class TransactionsView(views.APIView):
         Validate users' wallets that participate in transaction
 
         :param wallets: list wallet ids of sender and receiver
-        :return: True or raise HTTP_400_BAD_REQUEST
+        :return: None or error response HTTP_422_UNPROCESSABLE_ENTITY
         """
         for w in wallets:
             try:
                 Users.objects.get(wallet_number=w)
-            except(Users.DoesNotExist, ValidationError):
-                raise status.HTTP_400_BAD_REQUEST
-        return True
+            except(Users.DoesNotExist, ValidationError, TypeError):
+                response_msg = {'Error:': "Wallet number <{}> doesn't exist".format(
+                    w)}
+                return Response(response_msg, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
 
     def get(self, request):
         messages = Transaction.objects.all()
@@ -79,10 +76,22 @@ class TransactionsView(views.APIView):
     def post(self, request):
         sender_wallet_num = request.data['sender_wallet_number']
         receiver_wallet_num = request.data['receiver_wallet_number']
-        self.validate_users([sender_wallet_num, receiver_wallet_num])
+
+        response = self.validate_users([sender_wallet_num, receiver_wallet_num])
+        if response:
+            return response
 
         sender = self.get_object(sender_wallet_num)
         receiver = self.get_object(receiver_wallet_num)
+
+        if request.data['transaction_amount'] < 0:
+            response_msg = {'Error:': "Transaction amount should be a positive number, not {}".format(
+                request.data['transaction_amount'])}
+            return Response(response_msg, status=status.HTTP_406_NOT_ACCEPTABLE)
+        elif request.data['transaction_amount'] > sender.total:
+            response_msg = {'Error:': "You've got not enough money on your account: {}".format(
+                sender.total)}
+            return Response(response_msg, status=status.HTTP_406_NOT_ACCEPTABLE)
 
         # update users total info
         sender.total = sender.total - request.data['transaction_amount']
@@ -96,6 +105,8 @@ class TransactionsView(views.APIView):
         transaction_serializer = TransactionSerializer(data=request.data)
         if transaction_serializer.is_valid(raise_exception=True):
             transaction_serializer.save()
-            return Response(transaction_serializer.data, status=status.HTTP_202_ACCEPTED)
+            response = {"Success": "You've got a completed transaction!!!! Your total: {}".format(
+                Users.objects.get(wallet_number=request.data['sender_wallet_number']).total)}
+            return Response(response, status=status.HTTP_202_ACCEPTED)
 
         return Response(transaction_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
