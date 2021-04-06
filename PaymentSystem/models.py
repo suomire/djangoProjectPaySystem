@@ -1,5 +1,4 @@
-import datetime
-import random
+import uuid
 
 from django.db import models
 
@@ -7,8 +6,8 @@ from django.db import models
 # Create your models here.
 
 def generate_wallet_number():
-    number = ''.join([random.choice('1234567890') for _ in range(12)])
-    return int(number)
+    uuid_user = uuid.uuid4().__str__()
+    return uuid_user
 
 
 class Users(models.Model):
@@ -25,7 +24,7 @@ class Users(models.Model):
 
     username = models.CharField(max_length=255)
     password = models.CharField(max_length=255)
-    wallet_number = models.BigIntegerField(default=generate_wallet_number(), primary_key=True)
+    wallet_number = models.CharField(max_length=36, default=generate_wallet_number(), primary_key=True)
     total = models.IntegerField(default=5000)
 
     def __str__(self):
