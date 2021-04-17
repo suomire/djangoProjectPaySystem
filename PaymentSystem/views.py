@@ -1,6 +1,3 @@
-from django.http import HttpResponse
-from django.shortcuts import render
-
 # Create your views here.
 from rest_framework import viewsets, views, status
 from rest_framework.exceptions import ValidationError
