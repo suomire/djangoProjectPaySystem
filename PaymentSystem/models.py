@@ -5,9 +5,7 @@ from django.db import models
 
 # Create your models here.
 
-def generate_wallet_number():
-    uuid_user = uuid.uuid4().__str__()
-    return uuid_user
+# create same uuid for session with multiple registrations......
 
 
 class Users(models.Model):
@@ -24,7 +22,8 @@ class Users(models.Model):
 
     username = models.CharField(max_length=255)
     password = models.CharField(max_length=255)
-    wallet_number = models.CharField(max_length=36, default=generate_wallet_number(), primary_key=True)
+    # temp = uuid.uuid4().__str__()
+    wallet_number = models.CharField(max_length=36, default=uuid.uuid4, primary_key=True)
     total = models.IntegerField(default=5000)
 
     def __str__(self):
