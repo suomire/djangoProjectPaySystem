@@ -1,4 +1,5 @@
 # Create your views here.
+from drf_yasg.utils import swagger_auto_schema
 from rest_framework import viewsets, views, status
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
@@ -24,6 +25,7 @@ class UsersView(views.APIView):
         serializer = UsersSerializer(messages, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+    @swagger_auto_schema(request_body=UsersSerializer)
     def post(self, request):
         serializer = UsersSerializer(data=request.data)
 
@@ -70,6 +72,7 @@ class TransactionsView(views.APIView):
         serializer = TransactionSerializer(messages, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+    @swagger_auto_schema(request_body=TransactionSerializer)
     def post(self, request):
         sender_wallet_num = request.data['sender_wallet_number']
         receiver_wallet_num = request.data['receiver_wallet_number']
