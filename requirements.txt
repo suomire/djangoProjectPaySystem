@@ -4,3 +4,5 @@ pyyaml
 uritemplate
 gunicorn
 whitenoise
+django-rest-swagger
+drf_yasg
